@@ -274,6 +274,7 @@ public:
 
             if (calabiIcon.isValid() && calabiWordmark.isValid())
             {
+                g.setColour (juce::Colours::white); // 100% full vibrant opacity for logos
                 auto iconBox = juce::Rectangle<float> (la.getX() + 34.0f, la.getCentreY() - 95.0f, 190.0f, 190.0f);
                 g.drawImageWithin (calabiIcon, (int) iconBox.getX(), (int) iconBox.getY(),
                                    (int) iconBox.getWidth(), (int) iconBox.getHeight(),
@@ -553,7 +554,10 @@ public:
 
         // Retro-futuristic gradient SERGIO title + CALABI YAU icon & badge
         if (headerIcon.isValid())
+        {
+            g.setColour (juce::Colours::white); // 100% full vibrant opacity
             g.drawImageWithin (headerIcon, 10, 4, HEADER_H - 8, HEADER_H - 8, juce::RectanglePlacement::centred);
+        }
 
         g.setGradientFill (juce::ColourGradient (
             juce::Colour (0xffffe2a8), 46.0f, 6.0f,
