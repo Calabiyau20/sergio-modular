@@ -1,0 +1,45 @@
+name: Build SERGIO Windows x64
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake (MSVC x64)
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build SERGIO VST3, Standalone & Gauntlet
+        run: cmake --build build --config Release --parallel --target Paperface50_VST3 Paperface50_Standalone Paperface50FX_VST3 Paperface50FX_Standalone pf50_gauntlet
+
+      - name: Run DSP Gauntlet Verification
+        run: .\build\Release\pf50_gauntlet.exe
+
+      - name: Package Windows x64 Bundles ZIP
+        shell: bash
+        run: |
+          OUT="SERGIO-2.0.0-Windows-x64"
+          mkdir -p "$OUT" dist
+          cp -R "build/Paperface50_artefacts/Release/VST3/SERGIO.vst3" "$OUT/"
+          cp -R "build/Paperface50FX_artefacts/Release/VST3/SERGIO FX.vst3" "$OUT/"
+          cp "build/Paperface50_artefacts/Release/Standalone/SERGIO.exe" "$OUT/"
+          cp "build/Paperface50FX_artefacts/Release/Standalone/SERGIO FX.exe" "$OUT/"
+          cat > "$OUT/INSTALL_WINDOWS.txt" << 'EOF'
+          SERGIO Modular Synthesizer v2.0.0 (Calabi Yau) - Windows x64
+          =============================================================
+          1. Copy "SERGIO.vst3" and "SERGIO FX.vst3" into:
+             C:\Program Files\Common Files\VST3\
+          2. Run "SERGIO.exe" or "SERGIO FX.exe" directly for Standalone use.
+          3. Rescan plugins in your DAW (Ableton, Reaper, FL Studio, Cubase, etc.).
+          License: GNU AGPL-3.0 (Free & Open Source).
+          EOF
+          7z a "dist/SERGIO-2.0.0-Windows-x64.zip" "$OUT"
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sergio-windows-x64
+          path: dist/SERGIO-2.0.0-Windows-x64.zip
